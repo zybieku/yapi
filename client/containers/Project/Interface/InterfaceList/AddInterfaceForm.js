@@ -1,7 +1,7 @@
 import React, { PureComponent as Component } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input, Select, Button } from 'antd';
-
+import { Form, Input, Select, Button, Cascader } from 'antd';
+import { connect } from 'react-redux';
 import constants from '../../../../constants/variable.js'
 import { handleApiPath, nameLengthLimit } from '../../../../common.js'
 const HTTP_METHOD = constants.HTTP_METHOD;
@@ -13,33 +13,43 @@ function hasErrors(fieldsError) {
   return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
 
+@connect(
+  state => {
+    return {
+      mulMenuData: state.inter.mulMenuData
+    };
+  },
 
+)
 class AddInterfaceForm extends Component {
   static propTypes = {
     form: PropTypes.object,
     onSubmit: PropTypes.func,
     onCancel: PropTypes.func,
     catid: PropTypes.number,
-    catdata: PropTypes.array
+    catdata: PropTypes.array,
+    mulMenuData: PropTypes.object
   }
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
+      let postData = values;
+      postData.catid = values.catids[values.catids.length - 1];
       if (!err) {
-        this.props.onSubmit(values, () => {
+        this.props.onSubmit(postData, () => {
           this.props.form.resetFields();
         });
 
       }
     });
   }
-
   handlePath = (e) => {
     let val = e.target.value
     this.props.form.setFieldsValue({
       path: handleApiPath(val)
     })
   }
+
   render() {
     const { getFieldDecorator, getFieldsError } = this.props.form;
     const prefixSelector = getFieldDecorator('method', {
@@ -50,7 +60,7 @@ class AddInterfaceForm extends Component {
           return <Option key={item} value={item}>{item}</Option>
         })}
       </Select>
-      );
+    );
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -62,7 +72,6 @@ class AddInterfaceForm extends Component {
       }
     };
 
-
     return (
 
       <Form onSubmit={this.handleSubmit}>
@@ -70,15 +79,14 @@ class AddInterfaceForm extends Component {
           {...formItemLayout}
           label="接口分类"
         >
-          {getFieldDecorator('catid', {
-            initialValue: this.props.catid ? this.props.catid + '' : this.props.catdata[0]._id + ''
+          {getFieldDecorator('catids', {
+            initialValue: this.props.mulMenuData[this.props.catid]
           })(
-            <Select>
-              {this.props.catdata.map(item => {
-                return <Option key={item._id} value={item._id + ""}>{item.name}</Option>
-              })}
-            </Select>
-            )}
+            <Cascader
+              options={this.props.catdata}
+              changeOnSelect
+            />
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}
@@ -88,7 +96,7 @@ class AddInterfaceForm extends Component {
             rules: nameLengthLimit('接口')
           })(
             <Input placeholder="接口名称" />
-            )}
+          )}
         </FormItem>
 
         <FormItem
@@ -101,7 +109,7 @@ class AddInterfaceForm extends Component {
             }]
           })(
             <Input onBlur={this.handlePath} addonBefore={prefixSelector} placeholder="/path" />
-            )}
+          )}
         </FormItem>
         <FormItem
           {...formItemLayout}

@@ -22,7 +22,9 @@ const limit = 20;
   state => {
     return {
       curData: state.inter.curdata,
+      mulMenuData: state.inter.mulMenuData,
       curProject: state.project.currProject,
+      currProjectTree: state.project.currProjectTree,
       catList: state.inter.list,
       totalTableList: state.inter.totalTableList,
       catTableList: state.inter.catTableList,
@@ -52,9 +54,11 @@ class InterfaceList extends Component {
 
   static propTypes = {
     curData: PropTypes.object,
+    mulMenuData: PropTypes.object,
     catList: PropTypes.array,
     match: PropTypes.object,
     curProject: PropTypes.object,
+    currProjectTree: PropTypes.array,
     history: PropTypes.object,
     fetchInterfaceListMenu: PropTypes.func,
     fetchInterfaceList: PropTypes.func,
@@ -83,7 +87,7 @@ class InterfaceList extends Component {
       await this.props.fetchInterfaceList(option);
     } else if (isNaN(params.actionId)) {
       let catid = params.actionId.substr(4);
-      this.setState({catid: +catid});
+      this.setState({ catid: +catid });
       let option = {
         page: this.state.current,
         limit,

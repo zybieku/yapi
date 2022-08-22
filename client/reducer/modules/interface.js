@@ -11,6 +11,7 @@ const CHANGE_EDIT_STATUS = 'yapi/interface/CHANGE_EDIT_STATUS';
 const FETCH_INTERFACE_LIST = 'yapi/interface/FETCH_INTERFACE_LIST';
 const SAVE_IMPORT_DATA = 'yapi/interface/SAVE_IMPORT_DATA';
 const FETCH_INTERFACE_CAT_LIST = 'yapi/interface/FETCH_INTERFACE_CAT_LIST';
+const UPDATE_MUL_MENU_DATA = 'yapi/interface/UPDATE_MUL_MENU_DATA';
 // const SAVE_INTERFACE_PROJECT_ID = 'yapi/interface/SAVE_INTERFACE_PROJECT_ID';
 // const GET_INTERFACE_GROUP_LIST = 'yapi/interface/GET_INTERFACE_GROUP_LIST';
 
@@ -22,7 +23,8 @@ const initialState = {
   totalTableList: [],
   catTableList: [],
   count: 0,
-  totalCount: 0
+  totalCount: 0,
+  mulMenuData:{}
 };
 
 export default (state = initialState, action) => {
@@ -64,6 +66,13 @@ export default (state = initialState, action) => {
         ...state,
         catTableList: action.payload.data.data.list,
         count: action.payload.data.data.count
+      };
+    }
+
+    case UPDATE_MUL_MENU_DATA: {
+      return {
+        ...state,
+        mulMenuData: action.catIdData
       };
     }
     default:
@@ -157,5 +166,12 @@ export async function fetchInterfaceCatList(params) {
   return {
     type: FETCH_INTERFACE_CAT_LIST,
     payload: result
+  };
+}
+
+export function updateMulMenuData(catIdData) {
+  return {
+    type: UPDATE_MUL_MENU_DATA,
+    catIdData
   };
 }

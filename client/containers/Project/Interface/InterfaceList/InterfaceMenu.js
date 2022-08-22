@@ -8,7 +8,8 @@ import {
   fetchInterfaceData,
   deleteInterfaceData,
   deleteInterfaceCatData,
-  initInterface
+  initInterface,
+  updateMulMenuData
 } from '../../../../reducer/modules/interface.js';
 import { getProject } from '../../../../reducer/modules/project.js';
 import { Input, Icon, Button, Modal, message, Tree, Tooltip } from 'antd';
@@ -31,7 +32,7 @@ const limit = 20;
     return {
       list: state.inter.list,
       inter: state.inter.curdata,
-      curProject: state.project.currProject,
+      currProjectTree: state.project.currProjectTree,
       expands: []
     };
   },
@@ -43,7 +44,8 @@ const limit = 20;
     initInterface,
     getProject,
     fetchInterfaceCatList,
-    fetchInterfaceList
+    fetchInterfaceList,
+    updateMulMenuData
   }
 )
 class InterfaceMenu extends Component {
@@ -53,7 +55,7 @@ class InterfaceMenu extends Component {
     projectId: PropTypes.string,
     list: PropTypes.array,
     fetchInterfaceListMenu: PropTypes.func,
-    curProject: PropTypes.object,
+    currProjectTree: PropTypes.array,
     fetchInterfaceData: PropTypes.func,
     addInterfaceData: PropTypes.func,
     deleteInterfaceData: PropTypes.func,
@@ -62,7 +64,8 @@ class InterfaceMenu extends Component {
     router: PropTypes.object,
     getProject: PropTypes.func,
     fetchInterfaceCatList: PropTypes.func,
-    fetchInterfaceList: PropTypes.func
+    fetchInterfaceList: PropTypes.func,
+    updateMulMenuData: PropTypes.func
   };
 
   /**
@@ -107,15 +110,32 @@ class InterfaceMenu extends Component {
   }
 
   switchList(_list) {
+    let catIdMap={}
     let list = _list.filter((item) => {
+      if (!item.parent_id) {
+        item.ids = [item._id]
+        catIdMap[item._id]=item.ids
+      }
+
       let childs = _list.filter(child => {
-        return item._id === child.parent_id
+        if (item._id === child.parent_id) {
+          if(item.ids&&item.ids.length){
+            child.ids = [...item.ids, child._id]
+          }else{
+            child.ids = [ child.parent_id, child._id]
+          }
+          catIdMap[child._id]=child.ids
+          return true
+        }
+        return false
       })
       if (childs && childs.length > 0) {
         item.children = childs
       }
+      this.state.update
       return !item.parent_id
     })
+    this.props.updateMulMenuData(catIdMap)
     return list
   }
 
@@ -466,7 +486,7 @@ class InterfaceMenu extends Component {
             className="addcatmodal"
           >
             <AddInterfaceForm
-              catdata={this.props.curProject.cat}
+              catdata={this.props.currProjectTree}
               catid={this.state.curCatid}
               onCancel={() => this.changeModal('visible', false)}
               onSubmit={this.handleAddInterface}

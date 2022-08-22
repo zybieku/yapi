@@ -110,6 +110,7 @@ class InterfaceMenu extends Component {
   }
 
   switchList(_list) {
+    console.log(_list);
     let catIdMap={}
     let list = _list.filter((item) => {
       if (!item.parent_id) {
@@ -386,6 +387,7 @@ class InterfaceMenu extends Component {
           }
           message.success('分类移动成功');
           this.getList();
+          this.props.getProject(this.props.projectId);
         });
       } else {
         //拖拽是接口

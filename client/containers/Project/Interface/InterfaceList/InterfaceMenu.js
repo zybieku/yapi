@@ -110,7 +110,6 @@ class InterfaceMenu extends Component {
   }
 
   switchList(_list) {
-    console.log(_list);
     let catIdMap={}
     let list = _list.filter((item) => {
       if (!item.parent_id) {

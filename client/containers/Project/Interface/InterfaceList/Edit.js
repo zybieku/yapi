@@ -18,7 +18,8 @@ import ProjectTag from '../../Setting/ProjectMessage/ProjectTag.js';
   state => {
     return {
       curdata: state.inter.curdata,
-      currProject: state.project.currProject
+      currProject: state.project.currProject,
+      currProjectTree: state.project.currProjectTree
     };
   },
   {
@@ -32,6 +33,7 @@ class InterfaceEdit extends Component {
   static propTypes = {
     curdata: PropTypes.object,
     currProject: PropTypes.object,
+    currProjectTree: PropTypes.array,
     updateInterfaceData: PropTypes.func,
     fetchInterfaceListMenu: PropTypes.func,
     fetchInterfaceData: PropTypes.func,
@@ -59,6 +61,7 @@ class InterfaceEdit extends Component {
 
   onSubmit = async params => {
     params.id = this.props.match.params.actionId;
+    params.catid = params.catids[params.catids.length - 1];
     let result = await axios.post('/api/interface/up', params);
     this.props.fetchInterfaceListMenu(this.props.currProject._id).then();
     this.props.fetchInterfaceData(params.id).then();
@@ -100,10 +103,10 @@ class InterfaceEdit extends Component {
     try {
       s = new WebSocket(
         wsProtocol +
-          '://' +
-          domain +
-          '/api/interface/solve_conflict?id=' +
-          this.props.match.params.actionId
+        '://' +
+        domain +
+        '/api/interface/solve_conflict?id=' +
+        this.props.match.params.actionId
       );
       s.onopen = () => {
         this.WebSocket = s;
@@ -185,12 +188,12 @@ class InterfaceEdit extends Component {
   };
 
   render() {
-    const { cat, basepath, switch_notice, tag } = this.props.currProject;
+    const { basepath, switch_notice, tag } = this.props.currProject;
     return (
       <div className="interface-edit">
         {this.state.status === 1 ? (
           <InterfaceEditForm
-            cat={cat}
+            cat={this.props.currProjectTree}
             mockUrl={this.state.mockUrl}
             basepath={basepath}
             noticed={switch_notice}

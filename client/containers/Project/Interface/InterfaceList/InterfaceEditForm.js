@@ -6,7 +6,7 @@ import constants from '../../../../constants/variable.js';
 import { handlePath, nameLengthLimit } from '../../../../common.js';
 import { changeEditStatus } from '../../../../reducer/modules/interface.js';
 import json5 from 'json5';
-import { message, Affix, Tabs, Modal } from 'antd';
+import { message, Affix, Tabs, Modal, Cascader } from 'antd';
 import EasyDragSort from '../../../../components/EasyDragSort/EasyDragSort.js';
 import mockEditor from 'client/components/AceEditor/mockEditor';
 import AceEditor from 'client/components/AceEditor/AceEditor';
@@ -109,7 +109,8 @@ const HTTP_REQUEST_HEADER = constants.HTTP_REQUEST_HEADER;
   state => {
     return {
       custom_field: state.group.field,
-      projectMsg: state.project.currProject
+      projectMsg: state.project.currProject,
+      mulMenuData: state.inter.mulMenuData
     };
   },
   {
@@ -129,7 +130,8 @@ class InterfaceEditForm extends Component {
     cat: PropTypes.array,
     changeEditStatus: PropTypes.func,
     projectMsg: PropTypes.object,
-    onTagClick: PropTypes.func
+    onTagClick: PropTypes.func,
+    mulMenuData: PropTypes.object
   };
 
   initState(curdata) {
@@ -289,11 +291,11 @@ class InterfaceEditForm extends Component {
           } else if (values.req_body_type === 'json') {
             values.req_headers
               ? values.req_headers.map(item => {
-                  if (item.name === 'Content-Type') {
-                    item.value = 'application/json';
-                    isHaveContentType = true;
-                  }
-                })
+                if (item.name === 'Content-Type') {
+                  item.value = 'application/json';
+                  isHaveContentType = true;
+                }
+              })
               : [];
             if (isHaveContentType === false) {
               values.req_headers = values.req_headers || [];
@@ -475,7 +477,7 @@ class InterfaceEditForm extends Component {
     }
 
     if (val && val.length > 3) {
-      val.replace(/\{(.+?)\}/g, function(str, match) {
+      val.replace(/\{(.+?)\}/g, function (str, match) {
         insertParams(match);
       });
     }
@@ -542,21 +544,21 @@ class InterfaceEditForm extends Component {
 
   // 处理批量导入参数
   handleBulkOk = () => {
-    let curValue = this.props.form.getFieldValue(this.state.bulkName)||[];
+    let curValue = this.props.form.getFieldValue(this.state.bulkName) || [];
     // { name: '', required: '1', desc: '', example: '' }
     let newValue = [];
 
     this.state.bulkValue.split('\n').forEach((item, index) => {
       let valueItem = Object.assign({}, curValue[index] || dataTpl[this.state.bulkName]);
       let indexOfColon = item.indexOf(':');
-      if (indexOfColon!==-1) {
+      if (indexOfColon !== -1) {
         valueItem.name = item.substring(0, indexOfColon);
         valueItem.example = item.substring(indexOfColon + 1) || '';
         newValue.push(valueItem);
       }
     });
 
-    this.props.form.setFieldsValue({[this.state.bulkName]: newValue});
+    this.props.form.setFieldsValue({ [this.state.bulkName]: newValue });
     this.setState({
       visible: false,
       bulkValue: null,
@@ -578,7 +580,7 @@ class InterfaceEditForm extends Component {
     let value = this.props.form.getFieldValue(name);
 
     let bulkValue = ``;
-    if(value) {
+    if (value) {
       value.forEach(item => {
         return (bulkValue += item.name ? `${item.name}:${item.example || ''}\n` : '');
       });
@@ -793,8 +795,8 @@ class InterfaceEditForm extends Component {
 
     const headerList = this.state.req_headers
       ? this.state.req_headers.map((item, index) => {
-          return headerTpl(item, index);
-        })
+        return headerTpl(item, index);
+      })
       : [];
 
     const requestBodyList = this.state.req_body_form.map((item, index) => {
@@ -835,19 +837,13 @@ class InterfaceEditForm extends Component {
             </FormItem>
 
             <FormItem className="interface-edit-item" {...formItemLayout} label="选择分类">
-              {getFieldDecorator('catid', {
-                initialValue: this.state.catid + '',
-                rules: [{ required: true, message: '请选择一个分类' }]
+              {getFieldDecorator('catids', {
+                initialValue: this.props.mulMenuData[this.state.catid]
               })(
-                <Select placeholder="请选择一个分类">
-                  {this.props.cat.map(item => {
-                    return (
-                      <Option key={item._id} value={item._id + ''}>
-                        {item.name}
-                      </Option>
-                    );
-                  })}
-                </Select>
+                <Cascader
+                  options={this.props.cat}
+                  changeOnSelect
+                />
               )}
             </FormItem>
 
@@ -901,7 +897,7 @@ class InterfaceEditForm extends Component {
                     disabled
                     value={this.props.basepath}
                     readOnly
-                    onChange={() => {}}
+                    onChange={() => { }}
                     style={{ width: '25%' }}
                   />
                 </Tooltip>
@@ -1141,24 +1137,24 @@ class InterfaceEditForm extends Component {
             </Row>
 
             {this.props.form.getFieldValue('req_body_type') === 'file' &&
-            this.state.hideTabs.req.body !== 'hide' ? (
-              <Row className="interface-edit-item">
-                <Col className="interface-edit-item-other-body">
-                  {getFieldDecorator('req_body_other', {
+              this.state.hideTabs.req.body !== 'hide' ? (
+                <Row className="interface-edit-item">
+                  <Col className="interface-edit-item-other-body">
+                    {getFieldDecorator('req_body_other', {
                     initialValue: this.state.req_body_other
                   })(<TextArea placeholder="" autosize={true} />)}
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
             ) : null}
             {this.props.form.getFieldValue('req_body_type') === 'raw' &&
-            this.state.hideTabs.req.body !== 'hide' ? (
-              <Row>
-                <Col>
-                  {getFieldDecorator('req_body_other', {
+              this.state.hideTabs.req.body !== 'hide' ? (
+                <Row>
+                  <Col>
+                    {getFieldDecorator('req_body_other', {
                     initialValue: this.state.req_body_other
                   })(<TextArea placeholder="" autosize={{ minRows: 8 }} />)}
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
             ) : null}
           </div>
 

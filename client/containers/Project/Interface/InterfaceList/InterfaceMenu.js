@@ -442,7 +442,6 @@ class InterfaceMenu extends Component {
     return { menuList, arr };
   };
 
-
   render() {
     const matchParams = this.props.match.params;
     // let menuList = this.state.list;

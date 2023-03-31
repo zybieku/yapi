@@ -20,9 +20,9 @@ const path = require('path');
 // const htmlCss = require("jsondiffpatch/public/formatters-styles/html.css");
 
 
-function handleHeaders(values) {
+function handleHeaders(values){
   let isfile = false,
-    isHaveContentType = false;
+  isHaveContentType = false;
   if (values.req_body_type === 'form') {
     values.req_body_form.forEach(item => {
       if (item.type === 'file') {
@@ -45,11 +45,11 @@ function handleHeaders(values) {
   } else if (values.req_body_type === 'json') {
     values.req_headers
       ? values.req_headers.map(item => {
-        if (item.name === 'Content-Type') {
-          item.value = 'application/json';
-          isHaveContentType = true;
-        }
-      })
+          if (item.name === 'Content-Type') {
+            item.value = 'application/json';
+            isHaveContentType = true;
+          }
+        })
       : [];
     if (isHaveContentType === false) {
       values.req_headers = values.req_headers || [];
@@ -281,9 +281,11 @@ class interfaceController extends baseController {
     yapi.emitHook('interface_add', result).then();
     this.catModel.get(params.catid).then(cate => {
       let username = this.getUsername();
-      let title = `<a href="/user/profile/${this.getUid()}">${username}</a> 为分类 <a href="/project/${params.project_id
-        }/interface/api/cat_${params.catid}">${cate.name}</a> 添加了接口 <a href="/project/${params.project_id
-        }/interface/api/${result._id}">${data.title}</a> `;
+      let title = `<a href="/user/profile/${this.getUid()}">${username}</a> 为分类 <a href="/project/${
+        params.project_id
+      }/interface/api/cat_${params.catid}">${cate.name}</a> 添加了接口 <a href="/project/${
+        params.project_id
+      }/interface/api/${result._id}">${data.title}</a> `;
 
       yapi.commons.saveLog({
         content: title,
@@ -361,12 +363,12 @@ class interfaceController extends baseController {
           let data = Object.assign({}, ctx);
           data.params = validParams;
 
-          if (params.res_body_is_json_schema && params.dataSync === 'good') {
-            try {
+          if(params.res_body_is_json_schema && params.dataSync === 'good'){
+            try{
               let new_res_body = yapi.commons.json_parse(params.res_body)
               let old_res_body = yapi.commons.json_parse(item.res_body)
-              data.params.res_body = JSON.stringify(mergeJsonSchema(old_res_body, new_res_body), null, 2);
-            } catch (err) { }
+              data.params.res_body = JSON.stringify(mergeJsonSchema(old_res_body, new_res_body),null,2);
+            }catch(err){}
           }
           await this.up(data);
         } else {
@@ -444,8 +446,8 @@ class interfaceController extends baseController {
 
     try {
       let result = await this.Model.get(params.id);
-      if (this.$tokenAuth) {
-        if (params.project_id !== result.project_id) {
+      if(this.$tokenAuth){
+        if(params.project_id !== result.project_id){
           ctx.body = yapi.commons.resReturn(null, 400, 'token有误')
           return;
         }
@@ -507,19 +509,19 @@ class interfaceController extends baseController {
       let result, count;
       if (limit === 'all') {
         result = await this.Model.list(project_id);
-        count = await this.Model.listCount({ project_id });
+        count = await this.Model.listCount({project_id});
       } else {
-        let option = { project_id };
+        let option = {project_id};
         if (status) {
           if (Array.isArray(status)) {
-            option.status = { "$in": status };
+            option.status = {"$in": status};
           } else {
             option.status = status;
           }
         }
         if (tag) {
           if (Array.isArray(tag)) {
-            option.tag = { "$in": tag };
+            option.tag = {"$in": tag};
           } else {
             option.tag = tag;
           }
@@ -572,17 +574,17 @@ class interfaceController extends baseController {
       }
 
 
-      let option = { catid }
+      let option = {catid}
       if (status) {
         if (Array.isArray(status)) {
-          option.status = { "$in": status };
+          option.status = {"$in": status};
         } else {
           option.status = status;
         }
       }
       if (tag) {
         if (Array.isArray(tag)) {
-          option.tag = { "$in": tag };
+          option.tag = {"$in": tag};
         } else {
           option.tag = tag;
         }
@@ -759,14 +761,16 @@ class interfaceController extends baseController {
     this.catModel.get(interfaceData.catid).then(cate => {
       let diffView2 = showDiffMsg(jsondiffpatch, formattersHtml, logData);
       if (diffView2.length <= 0) {
-        return; // 没有变化时，不写日志
+          return; // 没有变化时，不写日志
       }
       yapi.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 
-                    更新了分类 <a href="/project/${cate.project_id}/interface/api/cat_${data.catid
-          }">${cate.name}</a> 
-                    下的接口 <a href="/project/${cate.project_id}/interface/api/${id}">${interfaceData.title
-          }</a><p>${params.message}</p>`,
+                    更新了分类 <a href="/project/${cate.project_id}/interface/api/cat_${
+          data.catid
+        }">${cate.name}</a> 
+                    下的接口 <a href="/project/${cate.project_id}/interface/api/${id}">${
+          interfaceData.title
+        }</a><p>${params.message}</p>`,
         type: 'project',
         uid: this.getUid(),
         username: username,
@@ -792,8 +796,9 @@ class interfaceController extends baseController {
 
       let project = await this.projectModel.getBaseInfo(interfaceData.project_id);
 
-      let interfaceUrl = `${ctx.request.origin}/project/${interfaceData.project_id
-        }/interface/api/${id}`;
+      let interfaceUrl = `${ctx.request.origin}/project/${
+        interfaceData.project_id
+      }/interface/api/${id}`;
 
       yapi.commons.sendNotice(interfaceData.project_id, {
         title: `${username} 更新了接口`,
@@ -871,8 +876,9 @@ class interfaceController extends baseController {
       let username = this.getUsername();
       this.catModel.get(data.catid).then(cate => {
         yapi.commons.saveLog({
-          content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 <a href="/project/${cate.project_id
-            }/interface/api/cat_${data.catid}">${cate.name}</a> 下的接口 "${data.title}"`,
+          content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 <a href="/project/${
+            cate.project_id
+          }/interface/api/cat_${data.catid}">${cate.name}</a> 下的接口 "${data.title}"`,
           type: 'project',
           uid: this.getUid(),
           username: username,
@@ -949,15 +955,15 @@ class interfaceController extends baseController {
         project_id: params.project_id,
         desc: params.desc,
         uid: this.getUid(),
-        parent_id: params.parent_id || 0,  //默认0
         add_time: yapi.commons.time(),
         up_time: yapi.commons.time()
       });
 
       let username = this.getUsername();
       yapi.commons.saveLog({
-        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 添加了分类  <a href="/project/${params.project_id
-          }/interface/api/cat_${result._id}">${params.name}</a>`,
+        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 添加了分类  <a href="/project/${
+          params.project_id
+        }/interface/api/cat_${result._id}">${params.name}</a>`,
         type: 'project',
         uid: this.getUid(),
         username: username,
@@ -989,8 +995,9 @@ class interfaceController extends baseController {
       });
 
       yapi.commons.saveLog({
-        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了分类 <a href="/project/${cate.project_id
-          }/interface/api/cat_${params.catid}">${cate.name}</a>`,
+        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了分类 <a href="/project/${
+          cate.project_id
+        }/interface/api/cat_${params.catid}">${cate.name}</a>`,
         type: 'project',
         uid: this.getUid(),
         username: username,
@@ -1020,140 +1027,32 @@ class interfaceController extends baseController {
 
       let username = this.getUsername();
       yapi.commons.saveLog({
-        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 "${catData.name
-          }" 及该分类下的接口`,
+        content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 "${
+          catData.name
+        }" 及该分类下的接口`,
         type: 'project',
         uid: this.getUid(),
         username: username,
         typeid: catData.project_id
       });
-    
-      //递归删除
-      let r = await this.recursionDelCat(id)
+
+      let interfaceData = await this.Model.listByCatid(id);
+
+      interfaceData.forEach(async item => {
+        try {
+          yapi.emitHook('interface_del', item._id).then();
+          await this.caseModel.delByInterfaceId(item._id);
+        } catch (e) {
+          yapi.commons.log(e.message, 'error');
+        }
+      });
+      await this.catModel.del(id);
+      let r = await this.Model.delByCatid(id);
       return (ctx.body = yapi.commons.resReturn(r));
     } catch (e) {
       yapi.commons.resReturn(null, 400, e.message);
     }
   }
-
-  /**
-   * 递归删除文件夹
-   * @param {String} id  分类catid
-   * @returns 
-   */
-  async recursionDelCat(id) {
-      //删除子集
-    let children = await this.catModel.getChildByid(id);
-     if(children){
-       for (const category of children) {
-        await this.recursionDelCat(category._id)
-       }
-     }
- /*      children && children.forEach(async category => {
-       await this.recursionDelCat(category._id)
-    }) */
-
-    let interfaceData = await this.Model.listByCatid(id);
-
-    interfaceData.forEach(async item => {
-      try {
-        yapi.emitHook('interface_del', item._id).then();
-        await this.caseModel.delByInterfaceId(item._id);
-      } catch (e) {
-        yapi.commons.log(e.message, 'error');
-      }
-    });
-    await this.catModel.del(id);
-    return await this.Model.delByCatid(id)
-  }
-
-  /**
-  * 拖拽的时候根据type更新目标所属id及index
-  * @param {Object} ctx 
-  * @returns 
-  */
-  async upPidOrCid(ctx) {
-    try {
-      let { id, catid, dragId, sort } = ctx.request.body || {};
-      if (!dragId) {
-        return (ctx.body = yapi.commons.resReturn(null, 400, '拖拽的id不能为空'));
-      }
-      let info = {};
-
-      if (catid) {
-        //drop 目标是分类
-        let { parent_id, index } = await this.catModel.get(catid);
-        info.parent_id = parent_id
-        info.index = index
-      } else {
-        //drop目标是接口
-        let { catid: parent_id, index } = await this.Model.get(id);
-        info.parent_id = parent_id  //catid 转换parent_id
-        info.index = index
-      }
-      info.index += sort
-      let result = null;
-      //拖拽的是接口，修改catid
-      if (dragId.indexOf('cat_') === -1) {
-        result = await this.Model.up(dragId, { index: info.index, catid: info.parent_id })
-      } else {
-        //拖拽的是分类，修改pid
-        result = await this.catModel.up(dragId.split('_')[1], info);
-      }
-      ctx.body = yapi.commons.resReturn(result);
-    } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message);
-    }
-  }
-
-  /**
- * 更新分类父级id
- * @interface /interface/up_cat_pid
- * @method POST
- * @category col
- * @foldnumber 10
- * @returns {Object}
- */
-  async upCatPid(ctx) {
-    try {
-      let params = ctx.request.body;
-
-      // let username = this.getUsername();
-      let cate = await this.catModel.get(params.catid);
-
-      let auth = await this.checkAuth(cate.project_id, 'project', 'edit');
-      if (!auth) {
-        return (ctx.body = yapi.commons.resReturn(null, 400, '没有权限'));
-      }
-      let result = await this.catModel.upPid(params.catid, params.parent_id);
-
-      ctx.body = yapi.commons.resReturn(result);
-    } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message);
-    }
-  }
-
-  /**
-  * 更新interface的catid
-  * @interface /interface/up_catid
-  * @method POST
-  * @param {Object}  {id, catid}
-  * @returns {Object}
-  * @example
-  */
-  async upCatid(ctx) {
-    try {
-      let params = ctx.request.body;
-      if (!params.id) {
-        return (ctx.body = yapi.commons.resReturn(null, 400, '接口id不能为空'));
-      }
-      let result = await this.Model.upCatid(params.id, params.catid)
-      return (ctx.body = yapi.commons.resReturn(result));
-    } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message);
-    }
-  }
-
 
   /**
    * 获取分类列表
@@ -1268,7 +1167,7 @@ class interfaceController extends baseController {
       params.forEach(item => {
         if (item.id) {
           this.Model.upIndex(item.id, item.index).then(
-            res => { },
+            res => {},
             err => {
               yapi.commons.log(err.message, 'error');
             }
@@ -1301,7 +1200,7 @@ class interfaceController extends baseController {
       params.forEach(item => {
         if (item.id) {
           this.catModel.upCatIndex(item.id, item.index).then(
-            res => { },
+            res => {},
             err => {
               yapi.commons.log(err.message, 'error');
             }

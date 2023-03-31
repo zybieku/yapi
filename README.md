@@ -41,7 +41,7 @@
 <br/>
 
  **方式一**：`zip包解压安装`  
-    - 1 下载zip包，解压 [CSDN多级目录包](https://download.csdn.net/download/zybieku/34093967) , 或者 [百度网盘，提取码: 5qgk](https://pan.baidu.com/s/1wPwX0wW7StqoN5AIMvM5KA)    
+    - 1 下载zip包，可选 [CSDN源码包](https://download.csdn.net/download/zybieku/34093967) , 或者 [百度网盘，提取码: 5qgk](https://pan.baidu.com/s/1aoA_KoNw9pyEx0Sw8ktxwg)    
     - 2 切换到 yapi 目录，修改config配置  
     - 3 切换到 vendors 目录，运行 npm run install-server （初始数据库，有库数据略过）  
     - 4 node server/app.js 启动（pm2亦可）  
@@ -90,7 +90,9 @@
  一般依赖报错是由于 yapi的很多依赖库版本有点旧 ，需要手动锁定版本
 
  - 2. node-sass node-gyp  安装不上 
-   可能是node-gyp没安装
+   可能是node-gyp没安装  
+
+   建议node14,高版本和node-sass的版本匹配
    ```shell
     npm install -g node-gyp
     npm rebuild node-gyp
